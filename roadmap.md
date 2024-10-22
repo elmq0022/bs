@@ -1,22 +1,31 @@
-- [ ] Define Some Models with sql alchemy
-    - [ ] Article (async driver)
+- [x] Define Some Models with SQLModel
+    - [x] Article (async driver)
 
-- [ ] Add Some Article Endpoints
-    - [ ] List
+- [x] Add Some Article Endpoints
+    - [x] Create
+    - [x] Get
+    - [x] List
+    - [x] Update
+    - [x] Delete
+
+- [ ] Authorization
+    - OAut2, see FastAPI Docs
     - [ ] Create
     - [ ] Update
     - [ ] Delete
-    - [ ] View
 
-- [ ] Authorization
-    - What kind?
+- [ ] Front End
+    - [ ] Server Static with FastAPI
+    - [ ] React?
 
-- [ ] Search
-    - Use postgresql index? 
+- [ ] Docker Image
 
 - [ ] CLI to manage articles
     - what language go / rust / python
+    - I'd like compiled with easy builds
+    - Crossplatform support
 
-- [ ] Docker Image
+- [ ] Search
+    - Use postgresql index? 
 
 - [ ] K8s / Helm Chart
