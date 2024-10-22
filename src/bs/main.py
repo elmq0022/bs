@@ -1,64 +1,62 @@
-from fastapi import FastAPI, HTTPException, Query
-from bs.models import Article
 import uuid
-
 from typing import Annotated
 
+from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlalchemy import select
-from fastapi import Depends
+from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import sessionmaker
+from sqlmodel import SQLModel
+from sqlmodel.ext.asyncio.session import AsyncSession
 
-
-from sqlmodel import (
-    Session,
-    create_engine,
-)
-
+from bs.models import Article
 
 sqlite_file_name = "db.sqlite3"
-sqlite_url = f"sqlite:///{sqlite_file_name}"
+sqlite_url = f"sqlite+aiosqlite:///{sqlite_file_name}"
 
 connect_args = {"check_same_thread": False}
-engine = create_engine(sqlite_url, connect_args=connect_args)
+engine = create_async_engine(sqlite_url, connect_args=connect_args)
 
 
-def get_session():
-    with Session(engine) as session:
+async def get_session() -> AsyncSession:
+    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    async with async_session() as session:
         yield session
 
 
-SessionDep = Annotated[Session, Depends(get_session)]
+SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
 
 app = FastAPI()
 
 
 @app.post("/articles/")
-def create_article(article: Article, session: SessionDep) -> Article:
+async def create_article(article: Article, session: SessionDep) -> Article:
     session.add(article)
-    session.commit()
-    session.refresh(article)
+    await session.commit()
+    await session.refresh(article)
     return article
 
 
 @app.get("/articles/")
-def read_articles(
+async def read_articles(
     session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100
 ) -> list[Article]:
     statement = select(Article)
     statement = statement.offset(offset)
     statement = statement.limit(limit)
-    articles = session.exec(statement).scalars().all()
+    articles = await session.exec(statement)
+    articles = articles.scalars().all()
     return articles
 
 
 @app.patch("/articles/{article_id}")
-def update_article(
+async def update_article(
     session: SessionDep,
     article_id: uuid.UUID,
-    title: str|None = None,
-    body: str|None = None,
+    title: str | None = None,
+    body: str | None = None,
 ) -> Article:
-    article = session.get(Article, article_id)
+    article = await session.get(Article, article_id)
 
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
@@ -69,24 +67,25 @@ def update_article(
     if body:
         article.body = body
 
-    session.commit()
-    session.refresh(article)
+    await session.commit()
+    await session.refresh(article)
     return article
 
 
 @app.get("/articles/{article_id}")
-def read_article(article_id: uuid.UUID, session: SessionDep) -> Article:
-    article = session.get(Article, article_id)
+async def read_article(article_id: uuid.UUID, session: SessionDep) -> Article:
+    article = await session.get(Article, article_id)
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
     return article
 
 
 @app.delete("/articles/{article_id}")
-def delete_article(article_id: uuid.UUID, session: SessionDep):
-    article = session.get(Article, article_id)
+async def delete_article(article_id: uuid.UUID, session: SessionDep):
+    article = await session.get(Article, article_id)
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
-    session.delete(article)
-    session.commit()
+
+    await session.delete(article)
+    await session.commit()
     return {"ok": True}
