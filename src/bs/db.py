@@ -4,8 +4,12 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
+from pathlib import Path
 
-sqlite_file_name = "db.sqlite3"
+
+parent = Path(__file__).parent
+sqlite_file_name = parent / "db.sqlite3"
+sqlite_file_name = str(sqlite_file_name.absolute())
 sqlite_url = f"sqlite+aiosqlite:///{sqlite_file_name}"
 
 connect_args = {"check_same_thread": False}
