@@ -9,10 +9,14 @@
     - [x] Delete
 
 - [ ] Authorization
-    - OAut2, see FastAPI Docs
+    - OAuth2, see FastAPI Doc
+    - Would an API key be better?
+    - Maybe use Basic Auth to request an API key?
     - [ ] Create
     - [ ] Update
     - [ ] Delete
+
+- [ ] Rate Limit the API
 
 - [ ] Front End
     - [ ] Server Static with FastAPI
@@ -27,5 +31,7 @@
 
 - [ ] Search
     - Use postgresql index? 
+    - Elastic Search
+    - Whoosh
 
 - [ ] K8s / Helm Chart
