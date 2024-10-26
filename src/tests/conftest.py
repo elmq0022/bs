@@ -5,8 +5,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlmodel import SQLModel
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from bs.main import app, get_session
-
+from bs.main import app
+from bs.db import get_session
 
 @pytest.fixture
 def anyio_backend():

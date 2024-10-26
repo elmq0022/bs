@@ -1,30 +1,11 @@
 import uuid
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.orm import sessionmaker
-from sqlmodel import SQLModel
-from sqlmodel.ext.asyncio.session import AsyncSession
 
+from bs.db import SessionDep
 from bs.models import Article
-
-sqlite_file_name = "db.sqlite3"
-sqlite_url = f"sqlite+aiosqlite:///{sqlite_file_name}"
-
-connect_args = {"check_same_thread": False}
-engine = create_async_engine(sqlite_url, connect_args=connect_args)
-
-
-async def get_session() -> AsyncSession:
-    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    async with async_session() as session:
-        yield session
-
-
-SessionDep = Annotated[AsyncSession, Depends(get_session)]
-
 
 app = FastAPI()
 
