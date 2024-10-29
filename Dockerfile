@@ -1,5 +1,7 @@
 FROM ghcr.io/astral-sh/uv:python3.11-bookworm-slim
 
+RUN apt update && apt install -y curl
+
 WORKDIR /app
 
 # Install dependencies
@@ -8,8 +10,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-install-project
 
+HEALTHCHECK CMD curl --fail http://localhost:80/health/v1 || exit 1
+
 COPY ./ /app/
 
 RUN uv sync --frozen
 
-CMD ["uv", "run", "fastapi", "run", "src/bs/main.py", "--port", "80"]
+ENTRYPOINT ["uv", "run", "fastapi", "run", "src/bs/main.py", "--port", "80"]
