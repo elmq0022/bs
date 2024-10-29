@@ -13,18 +13,18 @@ async def test_read_articles(session, client):
     session.add(a)
     session.add(b)
 
-    resp = client.get("/articles/")
+    resp = client.get("/v1/articles/")
     assert resp.status_code == 200
     assert len(resp.json()) == 2
 
 
 async def test_post_article(session, client):
-    resp = client.post("/articles/", json={"body": "body", "title": "title"})
+    resp = client.post("/v1/articles/", json={"body": "body", "title": "title"})
     assert resp.status_code == 200
     data = resp.json()
     id_ = data.get("id")
 
-    resp = client.get(f"articles/{id_}")
+    resp = client.get(f"/v1/articles/{id_}")
     assert resp.status_code == 200
 
     new_article = await session.get(Article, uuid.UUID(id_))
@@ -40,7 +40,7 @@ async def test_get_article_by_key(session, client):
     a = Article(id=id_, body=body, title=title)
     session.add(a)
 
-    resp = client.get(f"/articles/{id_}")
+    resp = client.get(f"/v1/articles/{id_}")
     assert resp.status_code == 200
     data = resp.json()
     assert data["body"] == body
@@ -56,7 +56,7 @@ async def test_update_article(client, session):
 
     id_ = a.id
 
-    resp = client.patch(f"articles/{str(id_)}", params={"title": "3", "body": "4"})
+    resp = client.patch(f"/v1/articles/{str(id_)}", params={"title": "3", "body": "4"})
     assert resp.status_code == 200
 
     await session.refresh(a)
@@ -72,7 +72,7 @@ async def test_delete_article(client, session):
 
     id_ = a.id
 
-    resp = client.delete(f"articles/{id_}")
+    resp = client.delete(f"/v1/articles/{id_}")
 
     assert resp.status_code == 200
     assert resp.json() == {"ok": True}

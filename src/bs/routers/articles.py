@@ -7,10 +7,10 @@ from sqlalchemy import select
 from bs.db import SessionDep
 from bs.models import Article
 
-router = APIRouter(prefix="/articles")
+router_v1 = APIRouter(prefix="/v1/articles")
 
 
-@router.post("/")
+@router_v1.post("/")
 async def create_article(article: Article, session: SessionDep) -> Article:
     session.add(article)
     await session.commit()
@@ -18,7 +18,7 @@ async def create_article(article: Article, session: SessionDep) -> Article:
     return article
 
 
-@router.get("/")
+@router_v1.get("/")
 async def read_articles(
     session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100
 ) -> list[Article]:
@@ -30,7 +30,7 @@ async def read_articles(
     return articles
 
 
-@router.patch("/{article_id}")
+@router_v1.patch("/{article_id}")
 async def update_article(
     session: SessionDep,
     article_id: uuid.UUID,
@@ -53,7 +53,7 @@ async def update_article(
     return article
 
 
-@router.get("/{article_id}")
+@router_v1.get("/{article_id}")
 async def read_article(article_id: uuid.UUID, session: SessionDep) -> Article:
     article = await session.get(Article, article_id)
     if not article:
@@ -61,7 +61,7 @@ async def read_article(article_id: uuid.UUID, session: SessionDep) -> Article:
     return article
 
 
-@router.delete("/{article_id}")
+@router_v1.delete("/{article_id}")
 async def delete_article(article_id: uuid.UUID, session: SessionDep):
     article = await session.get(Article, article_id)
     if not article:

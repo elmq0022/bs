@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --frozen --no-install-project
 
-HEALTHCHECK CMD curl --fail http://localhost:80/health/v1 || exit 1
+HEALTHCHECK CMD curl --fail http://localhost:80/v1/health || exit 1
 
 COPY ./ /app/
 
